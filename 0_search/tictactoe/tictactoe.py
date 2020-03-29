@@ -56,14 +56,14 @@ def result(board, action):
     """
 
     if terminal(board):
-        raise GameOver
+        raise ValueError("Game over.")
     elif action not in actions(board):
-        raise InvalidAction
+        raise ValueError("Invalid action.")
     else:
         p = player(board)
         result_board = copy.deepcopy(board)
         (i, j) = action
-        result_board[i, j] = p
+        result_board[i][j] = p
 
     return result_board
 
@@ -72,46 +72,43 @@ def winner(board):
     Returns the winner of the game, if there is one.
     """
     
-    if not terminal(board):
-        return None
-
-    if board[0,0] == board[0,1] == board[0,2]:
-        if board[0,0] == X:
+    if board[0][0] == board[0][1] == board[0][2] != None:
+        if board[0][0] == X:
             return X
         else:
             return O
-    elif board[1,0] == board[1,1] == board[1,2]: 
-        if board[1,0] == X:
+    elif board[1][0] == board[1][1] == board[1][2] != None: 
+        if board[1][0] == X:
             return X
         else:
             return O
-    elif board[2,0] == board[2,1] == board[2,2]:
-        if board[2,0] == X:
+    elif board[2][0] == board[2][1] == board[2][2] != None:
+        if board[2][0] == X:
             return X
         else:
             return O
-    elif board[0,0] == board[1,0] == board[2,0]:
-        if board[0,0] == X:
+    elif board[0][0] == board[1][0] == board[2][0] != None:
+        if board[0][0] == X:
             return X
         else:
             return O
-    elif board[0,1] == board[1,1] == board[2,1]:
-        if board[0,1] == X:
+    elif board[0][1] == board[1][1] == board[2][1] != None:
+        if board[0][1] == X:
             return X
         else:
             return O
-    elif board[0,2] == board[1,2] == board[2,2]:
-        if board[0,2] == X:
+    elif board[0][2] == board[1][2] == board[2][2] != None:
+        if board[0][2] == X:
             return X
         else:
             return O
-    elif board[0,0] == board[1,1] == board[2,2]:
-        if board[0,0] == X:
+    elif board[0][0] == board[1][1] == board[2][2] != None:
+        if board[0][0] == X:
             return X
         else:
             return O
-    elif board[0,2] == board[1,1] == board[2,0]:
-        if board[0,2] == X:
+    elif board[0][2] == board[1][1] == board[2][0] != None:
+        if board[0][2] == X:
             return X
         else:
             return O
@@ -122,6 +119,12 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
+
+    # Someone won
+    if winner(board) != None:
+        return True
+    
+    # All cells were filled
     for row in board:
         for cell in row:
             if cell == EMPTY:
@@ -147,32 +150,47 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    p = player(board)
 
-class Error(Exception):
-    """Base class for exceptions in this module."""
-    pass
+    # If empty board is provided as input, return corner.
+    if board == [[EMPTY]*3]*3:
+        return (0,0)
 
-class GameOver(Error):
-    """Game over.
+    if p == X:
+        v = float("-inf")
+        selected_action = None
+        for action in actions(board):
+            minValueResult = minValue(result(board, action))
+            if minValueResult > v:
+                v = minValueResult
+                selected_action = action
+    elif p == O:
+        v = float("inf")
+        selected_action = None
+        for action in actions(board):
+            maxValueResult = maxValue(result(board, action))
+            if maxValueResult < v:
+                v = maxValueResult
+                selected_action = action
 
-    Attributes:
-        expression -- input expression in which the error occurred
-        message -- explanation of the error
-    """
+    return selected_action
+    
+def maxValue(board):
+    if terminal(board):
+        return utility(board)
+    v = float("-inf")
+    for action in actions(board):
+        v = max(v, minValue(result(board, action)))
+    
+    return v
 
-    def __init__(self, expression, message):
-        self.expression = "Terminal board."
-        self.message = "Game over."
+def minValue(board):
+    if terminal(board):
+        return utility(board)
+    v = float("inf")
+    for action in actions(board):
+        v = min(v, maxValue(result(board, action)))
 
-class InvalidAction(Error):
-    """Exception raised for errors in the input.
+    return v
 
-    Attributes:
-        expression -- input expression in which the error occurred
-        message -- explanation of the error
-    """
 
-    def __init__(self, expression, message):
-        self.expression = "Invalid action."
-        self.message = "Invalid action." 
