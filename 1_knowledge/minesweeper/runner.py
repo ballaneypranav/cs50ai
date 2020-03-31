@@ -6,7 +6,7 @@ from minesweeper import Minesweeper, MinesweeperAI
 
 HEIGHT = 8
 WIDTH = 8
-MINES = 8
+MINES = 7
 
 # Colors
 BLACK = (0, 0, 0)
@@ -162,7 +162,7 @@ while True:
     move = None
 
     left, _, right = pygame.mouse.get_pressed()
-
+    
     # Check for a right-click to toggle flagging
     if right == 1 and not lost:
         mouse = pygame.mouse.get_pos()
@@ -187,9 +187,9 @@ while True:
                     flags = ai.mines.copy()
                     print("No moves left to make.")
                 else:
-                    print("No known safe moves, AI making random move.")
+                    print("No known safe moves, AI making random move", move)
             else:
-                print("AI making safe move.")
+                print("AI making safe move", move)
             time.sleep(0.2)
 
         # Reset game state
